@@ -47,33 +47,34 @@
                         <h4 class="mb-2">ยินดีต้อนรับ</h4>
                         <p class="mb-4">กรุณาลงชื่อเข้าใช้บัญชีของคุณ</p>
 
-                        <form id="formAuthentication" class="mb-3" method="POST">
-                            <div class="mb-3">
-                                <label for="email" class="form-label">ชื่อผู้ใช้งาน</label>
-                                <input type="text" class="form-control" id="username" name="username" placeholder="กรอกชื่อผู้ใช้งาน" autofocus />
-                            </div>
-                            <div class="mb-3 form-password-toggle">
-                                <div class="d-flex justify-content-between">
-                                    <label class="form-label" for="password">รหัสผ่าน</label>
-                                    <a href="../password/forgot/">
-                                        <small>ลืมรหัสผ่าน?</small>
-                                    </a>
-                                </div>
-                                <div class="input-group input-group-merge">
-                                    <input type="password" id="password" class="form-control" name="password" placeholder="กรอกรหัสผ่าน" aria-describedby="password" />
-                                    <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
-                                </div>
-                            </div>
-                            <div class="mb-3" hidden>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" name="remember-me" id="remember-me" />
-                                    <label class="form-check-label" for="remember-me"> จดจำรหัสผ่านไว้ </label>
-                                </div>
-                            </div>
-                            <div class="mb-3">
-                                <input type="submit" value="ลงชื่อเข้าใช้งาน" class="btn btn-primary d-grid w-100" name="btn_submit">
-                            </div>
-                        </form>
+<form id="formAuthentication" class="mb-3" method="POST" action="login.php">
+    <div class="mb-3">
+        <label for="email" class="form-label">ชื่อผู้ใช้งาน</label>
+        <input type="text" class="form-control" id="username" name="username" placeholder="กรอกชื่อผู้ใช้งาน" autofocus />
+    </div>
+    <div class="mb-3 form-password-toggle">
+        <div class="d-flex justify-content-between">
+            <label class="form-label" for="password">รหัสผ่าน</label>
+            <a href="../password/forgot/">
+                <small>ลืมรหัสผ่าน?</small>
+            </a>
+        </div>
+        <div class="input-group input-group-merge">
+            <input type="password" id="password" class="form-control" name="password" placeholder="กรอกรหัสผ่าน" aria-describedby="password" />
+            <span class="input-group-text cursor-pointer"><i class="bx bx-hide"></i></span>
+        </div>
+    </div>
+    <div class="mb-3" hidden>
+        <div class="form-check">
+            <input class="form-check-input" type="checkbox" name="remember-me" id="remember-me" />
+            <label class="form-check-label" for="remember-me"> จดจำรหัสผ่านไว้ </label>
+        </div>
+    </div>
+    <div class="mb-3">
+        <input type="submit" value="ลงชื่อเข้าใช้งาน" class="btn btn-primary d-grid w-100" name="btn_submit">
+    </div>
+</form>
+
                     </div>
                 </div>
                 <!-- /Register -->
