@@ -1,47 +1,49 @@
 <?php
-require 'vendor/autoload.php';
+require __DIR__ . '/vendor/autoload.php'; // ใช้ Composer สำหรับติดตั้ง Google Client Library
 
 use Google\Client;
 use Google\Service\Sheets;
 
 session_start();
 
-if (isset($_POST['btn_submit'])) {
+function getSheetData() {
+    $client = new Client();
+    $client->setApplicationName('Your Application Name');
+    $client->setScopes([Sheets::SPREADSHEETS_READONLY]);
+    $client->setAuthConfig(__DIR__ . '/../assets/credentials.json'); // ปรับเส้นทางให้ตรงกับที่เก็บไฟล์จริง
+
+    $service = new Sheets($client);
+    $spreadsheetId = '1dRwcM5EljmXpt1YGZ9EDi2wHT2YdA2Ec28N0HJ5ngMY'; // ID ของ Google Sheets
+    $range = 'Sheet1!A:B'; // ช่วงของข้อมูลที่ต้องการดึง (ปรับให้ตรงกับข้อมูลจริง)
+
+    try {
+        $response = $service->spreadsheets_values->get($spreadsheetId, $range);
+        return $response->getValues();
+    } catch (Exception $e) {
+        echo 'เกิดข้อผิดพลาดในการดึงข้อมูล: ' . $e->getMessage();
+        return null;
+    }
+}
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    // ตั้งค่า Google Client
-    $client = new Client();
-    $client->setAuthConfig('credentials.json');
-    $client->addScope(Sheets::SPREADSHEETS_READONLY);
+    $users = getSheetData(); // ดึงข้อมูลผู้ใช้งานและรหัสผ่านจาก Google Sheets
 
-    // สร้างบริการ Google Sheets
-    $service = new Sheets($client);
+    if ($users === null) {
+        echo "ไม่สามารถดึงข้อมูลผู้ใช้งานได้";
+        exit();
+    }
 
-    // ใส่ ID ของ Spreadsheet ของคุณ
-    $spreadsheetId = '1dRwcM5EljmXpt1YGZ9EDi2wHT2YdA2Ec28N0HJ5ngMY';
-    $range = 'Sheet1!D2:E';  // สมมติว่าข้อมูลผู้ใช้เริ่มจาก A2 ถึง B (A = username, B = password)
-
-    $response = $service->spreadsheets_values->get($spreadsheetId, $range);
-    $values = $response->getValues();
-
-    if (empty($values)) {
-        echo "ไม่พบข้อมูลใน Google Sheets";
-    } else {
-        $isValidUser = false;
-        foreach ($values as $row) {
-            if ($row[0] === $username && $row[1] === $password) {
-                $isValidUser = true;
-                break;
-            }
-        }
-
-        if ($isValidUser) {
+    foreach ($users as $user) {
+        if ($username === $user[0] && $password === $user[1]) { // สมมติว่าข้อมูลอยู่ในคอลัมน์ A และ B
+            $_SESSION['loggedin'] = true;
             $_SESSION['username'] = $username;
-            echo "ล็อกอินสำเร็จ!"; // หรือเปลี่ยนเป็น redirect ไปที่หน้าอื่น
-        } else {
-            echo "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
+            header('Location: dashboard.php'); // เปลี่ยนเส้นทางหลังจากเข้าสู่ระบบสำเร็จ
+            exit();
         }
     }
+    echo "ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง";
 }
 ?>
