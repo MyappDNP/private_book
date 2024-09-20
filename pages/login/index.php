@@ -47,7 +47,7 @@
                         <h4 class="mb-2">ยินดีต้อนรับ</h4>
                         <p class="mb-4">กรุณาลงชื่อเข้าใช้บัญชีของคุณ</p>
 
-                        <form id="formAuthentication" class="mb-3" method="POST" action="login.php">
+<form id="formAuthentication" class="mb-3" method="POST" action="login.php">
     <div class="mb-3">
         <label for="username" class="form-label">ชื่อผู้ใช้งาน</label>
         <input type="text" class="form-control" id="username" name="username" placeholder="กรอกชื่อผู้ใช้งาน" autofocus />
@@ -73,7 +73,11 @@
     <div class="mb-3">
         <input type="submit" value="ลงชื่อเข้าใช้งาน" class="btn btn-primary d-grid w-100" name="btn_submit">
     </div>
+    <!-- Hidden input for redirect_url -->
+    <input type="hidden" name="redirect_url" value="<?php echo htmlspecialchars($_SERVER['REQUEST_URI']); ?>">
 </form>
+
+
 
 
                     </div>

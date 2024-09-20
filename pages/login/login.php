@@ -1,49 +1,39 @@
 <?php
-require __DIR__ . '/vendor/autoload.php'; // ใช้ Composer สำหรับติดตั้ง Google Client Library
-
-use Google\Client;
-use Google\Service\Sheets;
-
 session_start();
 
-function getSheetData() {
-    $client = new Client();
-    $client->setApplicationName('Your Application Name');
-    $client->setScopes([Sheets::SPREADSHEETS_READONLY]);
-    $client->setAuthConfig(__DIR__ . '/../assets/credentials.json'); // ปรับเส้นทางให้ตรงกับที่เก็บไฟล์จริง
-
-    $service = new Sheets($client);
-    $spreadsheetId = '1dRwcM5EljmXpt1YGZ9EDi2wHT2YdA2Ec28N0HJ5ngMY'; // ID ของ Google Sheets
-    $range = 'Sheet1!A:B'; // ช่วงของข้อมูลที่ต้องการดึง (ปรับให้ตรงกับข้อมูลจริง)
-
-    try {
-        $response = $service->spreadsheets_values->get($spreadsheetId, $range);
-        return $response->getValues();
-    } catch (Exception $e) {
-        echo 'เกิดข้อผิดพลาดในการดึงข้อมูล: ' . $e->getMessage();
-        return null;
-    }
-}
-
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // โหลดข้อมูล CSV
+    $csvUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vT6fGnQkaVEra_SR_KymGaQ2_pHOBVo6qCCC_Jqnt7zO9lr7LMSgiv4DtF8-ngkcMG-vBn1VZuhGkIk/pub?gid=0&single=true&output=csv';
+    $csvData = file_get_contents($csvUrl);
+    $rows = array_map('str_getcsv', explode("\n", $csvData));
+    
+    // รับค่าจากฟอร์ม
     $username = $_POST['username'];
     $password = $_POST['password'];
 
-    $users = getSheetData(); // ดึงข้อมูลผู้ใช้งานและรหัสผ่านจาก Google Sheets
-
-    if ($users === null) {
-        echo "ไม่สามารถดึงข้อมูลผู้ใช้งานได้";
-        exit();
-    }
-
-    foreach ($users as $user) {
-        if ($username === $user[0] && $password === $user[1]) { // สมมติว่าข้อมูลอยู่ในคอลัมน์ A และ B
-            $_SESSION['loggedin'] = true;
-            $_SESSION['username'] = $username;
-            header('Location: dashboard.php'); // เปลี่ยนเส้นทางหลังจากเข้าสู่ระบบสำเร็จ
-            exit();
+    $isValidUser = false;
+    foreach ($rows as $row) {
+        if (count($row) < 2) continue;
+        if ($row[3] === $username && $row[4] === $password) {
+            $isValidUser = true;
+            break;
         }
     }
-    echo "ชื่อผู้ใช้งานหรือรหัสผ่านไม่ถูกต้อง";
+
+    if ($isValidUser) {
+        // เริ่มเซสชันและบันทึกข้อมูลผู้ใช้
+        $_SESSION['loggedin'] = true;
+        $_SESSION['username'] = $username;
+
+        // ตรวจสอบ redirect_url
+        $redirectUrl = isset($_POST['redirect_url']) ? $_POST['redirect_url'] : '/private_book/index.php';
+        error_log("Redirecting to: $redirectUrl"); // ดูใน error log
+
+        // เปลี่ยนเส้นทาง
+        header("Location: $redirectUrl");
+        exit; // ใช้ exit หลัง header
+    } else {
+        echo "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
+    }
 }
 ?>
