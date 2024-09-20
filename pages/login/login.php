@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         error_log("Redirecting to: $redirectUrl"); // ดูใน error log
 
         // เปลี่ยนเส้นทาง
-        header("Location: $redirectUrl");
+        header("Location: /private_book/index.php");
         exit; // ใช้ exit หลัง header
     } else {
         echo "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง";
